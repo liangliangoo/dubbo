@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A task which is executed after the delay specified with
  * {@link Timer#newTimeout(TimerTask, long, TimeUnit)} (TimerTask, long, TimeUnit)}.
+ * 封装具体执行的任务
  */
 public interface TimerTask {
 

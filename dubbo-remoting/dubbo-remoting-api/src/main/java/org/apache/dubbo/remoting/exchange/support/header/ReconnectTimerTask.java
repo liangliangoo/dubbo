@@ -39,6 +39,7 @@ public class ReconnectTimerTask extends AbstractTimerTask {
     @Override
     protected void doTask(Channel channel) {
         try {
+            //获取最后一次收到消息的事件
             Long lastRead = lastRead(channel);
             Long now = now();
 
@@ -51,6 +52,9 @@ public class ReconnectTimerTask extends AbstractTimerTask {
                     logger.error("Fail to connect to " + channel, e);
                 }
             // check pong at client
+            //如果在指定的时间内没有收到任何消息，则重连，
+            //reconnect方法内部有判断，如果当前连接是正常的，则不进行重连
+            //这里的idleTimeout是startReconnectTask方法中的heartbeatTimeoutTick，默认是1分钟
             } else if (lastRead != null && now - lastRead > idleTimeout) {
                 logger.warn("Reconnect to channel " + channel + ", because heartbeat read idle time out: "
                         + idleTimeout + "ms");

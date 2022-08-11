@@ -51,8 +51,12 @@ final class NettyChannel extends AbstractChannel {
      */
     private final Channel channel;
 
+    /**
+     * channel 的属性描述
+     */
     private final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 
+    /** channel状态 */
     private final AtomicBoolean active = new AtomicBoolean(false);
 
     /**
@@ -105,8 +109,10 @@ final class NettyChannel extends AbstractChannel {
      */
     static void removeChannelIfDisconnected(Channel ch) {
         if (ch != null && !ch.isActive()) {
+            // 从缓存中移除channel
             NettyChannel nettyChannel = CHANNEL_MAP.remove(ch);
             if (nettyChannel != null) {
+                // 将状态标记位非激活的状态
                 nettyChannel.markActive(false);
             }
         }

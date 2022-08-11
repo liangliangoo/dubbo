@@ -42,6 +42,7 @@ public class HeartbeatTimerTask extends AbstractTimerTask {
     @Override
     protected void doTask(Channel channel) {
         try {
+            //获取最后一次收到消息的事件
             Long lastRead = lastRead(channel);
             Long lastWrite = lastWrite(channel);
             Long now = now();

@@ -117,12 +117,16 @@ public class NettyClientHandler extends ChannelDuplexHandler {
                 if (logger.isDebugEnabled()) {
                     logger.debug("IdleStateEvent triggered, send heartbeat to channel " + channel);
                 }
+                // 创建心跳请求报文Request对象
                 Request req = new Request();
                 req.setVersion(Version.getProtocolVersion());
                 req.setTwoWay(true);
+                //HEARTBEAT_EVENT表示是心跳报文
                 req.setEvent(HEARTBEAT_EVENT);
+                // 发送心跳报文
                 channel.send(req);
             } finally {
+                // 检测当前Channel是否可用，如果不可用则修改状态为非活动状态
                 NettyChannel.removeChannelIfDisconnected(ctx.channel());
             }
         } else {

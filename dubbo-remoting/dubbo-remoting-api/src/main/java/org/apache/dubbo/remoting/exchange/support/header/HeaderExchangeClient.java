@@ -201,12 +201,21 @@ public class HeaderExchangeClient implements ExchangeClient {
         }
     }
 
+    /**
+     * 超时重试机制
+     * @param url
+     */
     private void startReconnectTask(URL url) {
+        // 可以通过参数“reconnect”设置是否启动重连，默认是true
         if (shouldReconnect(url)) {
             AbstractTimerTask.ChannelProvider cp = () -> Collections.singletonList(HeaderExchangeClient.this);
+            // idleTimeout=“heartbeat”*3或者“heartbeat.timeout”，默认空闲超时时间是3分钟
             int idleTimeout = getIdleTimeout(url);
+            // heartbeatTimeoutTick=idleTimeout/3，heartbeatTimeoutTick 最小是1000
             long heartbeatTimeoutTick = calculateLeastDuration(idleTimeout);
+            // 创建任务
             ReconnectTimerTask reconnectTimerTask = new ReconnectTimerTask(cp, heartbeatTimeoutTick, idleTimeout);
+            // 启动重连任务，每heartbeatTimeoutTick时间执行一次
             reconnectTimer = IDLE_CHECK_TIMER.get().newTimeout(reconnectTimerTask, heartbeatTimeoutTick, TimeUnit.MILLISECONDS);
         }
     }

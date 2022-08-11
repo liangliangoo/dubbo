@@ -105,9 +105,17 @@ public class NettyServerHandler extends ChannelDuplexHandler {
         handler.sent(channel, msg);
     }
 
+    /**
+     * 当有空闲时间超时时，还将会传递到这里，执行该方法处理超时
+     * {@inheritDoc}
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         // server will close channel when server don't receive any heartbeat from client util timeout.
+        // 只有Event属于IdleStateEvent 就会关闭对应的channel 并移除cache
         if (evt instanceof IdleStateEvent) {
             NettyChannel channel = NettyChannel.getOrAddChannel(ctx.channel(), url, handler);
             try {
@@ -117,6 +125,7 @@ public class NettyServerHandler extends ChannelDuplexHandler {
                 NettyChannel.removeChannelIfDisconnected(ctx.channel());
             }
         }
+        // 向下传递事件
         super.userEventTriggered(ctx, evt);
     }
 
