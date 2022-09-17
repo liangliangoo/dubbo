@@ -56,6 +56,7 @@ public class DefaultFilterChainBuilder implements FilterChainBuilder {
                 filters.addAll(tempFilters);
                 directors.add(moduleModel.getExtensionDirector());
             }
+            // 排序 & 去重
             filters = sortingAndDeduplication(filters, directors);
 
         } else {

@@ -27,6 +27,19 @@ import java.util.Map;
 /**
  * AbstractMethodConfig
  *
+ * <p></p>
+ * <a href="https://blog.csdn.net/songjunyan/article/details/123911958">这篇文章写的很细节</a>
+ * 那为什么会在Dubbo3的新版本中加入这个域模型呢,主要有如下原因
+ * 之前dubbo都是只有一个作用域的，通过静态类 属性共享
+ * 增加域模型是为了:
+ *
+ * 1、让Dubbo支持多应用的部署，这块一些大企业有诉求
+ * 2、从架构设计上，解决静态属性资源共享、清理的问题
+ * 3、分层模型将应用的管理和服务的管理分开
+ * 可能比较抽象，可以具体点来看Dubbo3中在启动时候需要启动配置中心，元数据中心这个配置中心和元数据中心可以归应用模型来管理，
+ * Dubbo作为RPC框架有需要启动服务和引用服务，
+ * 服务级别的管理就交给了这个模块模型来管理，分层次的管理方便我们理解和处理逻辑，父子级别的模型又方便了数据传递。
+ *
  * @export
  */
 public abstract class AbstractMethodConfig extends AbstractConfig {
@@ -100,6 +113,7 @@ public abstract class AbstractMethodConfig extends AbstractConfig {
     protected Integer forks;
 
     public AbstractMethodConfig() {
+        // 向父类传递参数
         super(ApplicationModel.defaultModel().getDefaultModule());
     }
 

@@ -35,16 +35,22 @@ import java.util.Set;
 
 /**
  * Model of a service module
+ * 服务模块的模型
  */
 public class ModuleModel extends ScopeModel {
     private static final Logger logger = LoggerFactory.getLogger(ModuleModel.class);
 
     public static final String NAME = "ModuleModel";
 
+    // 所属应用程序模型ApplicationModel实例对象applicationModel
     private final ApplicationModel applicationModel;
+    // 模块环境信息
     private ModuleEnvironment moduleEnvironment;
+    // 模块服务存储库
     private ModuleServiceRepository serviceRepository;
+    // 模块的服务配置管理
     private ModuleConfigManager moduleConfigManager;
+    // 模块部署器ModuleDeployer实例对象deployer用于导出和引用服务
     private ModuleDeployer deployer;
 
     public ModuleModel(ApplicationModel applicationModel) {
@@ -52,19 +58,24 @@ public class ModuleModel extends ScopeModel {
     }
 
     public ModuleModel(ApplicationModel applicationModel, boolean isInternal) {
+        // 调用ScopeModel传递3个参数父模型,模型域为模块域,是否为内部模型参数为true
         super(applicationModel, ExtensionScope.MODULE, isInternal);
         Assert.notNull(applicationModel, "ApplicationModel can not be null");
+        // 初始化成员变量
         this.applicationModel = applicationModel;
+        // 将模块模型添加至应用模型中
         applicationModel.addModule(this, isInternal);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(getDesc() + " is created");
         }
 
+        // 初始化模块模型
         initialize();
         Assert.notNull(getServiceRepository(), "ModuleServiceRepository can not be null");
         Assert.notNull(getConfigManager(), "ModuleConfigManager can not be null");
         Assert.assertTrue(getConfigManager().isInitialized(), "ModuleConfigManager can not be initialized");
 
+        // 获取应用程序发布对象，通知检查状态
         // notify application check state
         ApplicationDeployer applicationDeployer = applicationModel.getDeployer();
         if (applicationDeployer != null) {
@@ -74,11 +85,15 @@ public class ModuleModel extends ScopeModel {
 
     @Override
     protected void initialize() {
+        // 调用域模型ScopeModel的初始化
         super.initialize();
+        // 创建模块服务存储库对象
         this.serviceRepository = new ModuleServiceRepository(this);
 
+        // 初始化模块配置扩展
         initModuleExt();
 
+        // 初始化域模型扩展
         ExtensionLoader<ScopeModelInitializer> initializerExtensionLoader = this.getExtensionLoader(ScopeModelInitializer.class);
         Set<ScopeModelInitializer> initializers = initializerExtensionLoader.getSupportedExtensionInstances();
         for (ScopeModelInitializer initializer : initializers) {

@@ -45,6 +45,7 @@ import java.io.InputStream;
 
 /**
  * ExchangeCodec.
+ * dubbo 编解码器
  */
 public class ExchangeCodec extends TelnetCodec {
 
@@ -65,9 +66,17 @@ public class ExchangeCodec extends TelnetCodec {
         return MAGIC;
     }
 
+    /**
+     * 发送数据之前进行编码操作
+     * @param channel
+     * @param buffer
+     * @param msg
+     * @throws IOException
+     */
     @Override
     public void encode(Channel channel, ChannelBuffer buffer, Object msg) throws IOException {
         if (msg instanceof Request) {
+            // 核心逻辑在这个方法中
             encodeRequest(channel, buffer, (Request) msg);
         } else if (msg instanceof Response) {
             encodeResponse(channel, buffer, (Response) msg);
@@ -222,6 +231,7 @@ public class ExchangeCodec extends TelnetCodec {
     }
 
     protected void encodeRequest(Channel channel, ChannelBuffer buffer, Request req) throws IOException {
+        // 获取序列化方式
         Serialization serialization = getSerialization(channel, req);
         // header.
         byte[] header = new byte[HEADER_LENGTH];
@@ -246,16 +256,20 @@ public class ExchangeCodec extends TelnetCodec {
         buffer.writerIndex(savedWriteIndex + HEADER_LENGTH);
         ChannelBufferOutputStream bos = new ChannelBufferOutputStream(buffer);
 
+        // 心跳检测 逻辑
         if (req.isHeartbeat()) {
             // heartbeat request data is always null
             bos.write(CodecSupport.getNullBytesOf(serialization));
         } else {
+            // 获取输出流
             ObjectOutput out = serialization.serialize(channel.getUrl(), bos);
             if (req.isEvent()) {
+                // 序列化
                 encodeEventData(channel, out, req.getData());
             } else {
                 encodeRequestData(channel, out, req.getData(), req.getVersion());
             }
+            // 换新缓存
             out.flushBuffer();
             if (out instanceof Cleanable) {
                 ((Cleanable) out).cleanup();

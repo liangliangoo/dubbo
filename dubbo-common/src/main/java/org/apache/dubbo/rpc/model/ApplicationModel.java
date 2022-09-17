@@ -49,22 +49,35 @@ import java.util.concurrent.atomic.AtomicInteger;
  * ApplicationModel includes many ProviderModel which is about published services
  * and many Consumer Model which is about subscribed services.
  * <p>
+ *  应用程序领域模型
+ * 表示正在使用Dubbo的应用程序，并存储基本元数据信息，以便在RPC调用过程中使用。
+ * ExtensionLoader、DubboBootstrap和这个类目前被设计为单例或静态（本身完全静态或使用一些静态字段）。
+ * 因此，从它们返回的实例属于流程范围。如果想在一个进程中支持多个dubbo服务器，可能需要重构这三个类。
  */
 
 public class ApplicationModel extends ScopeModel {
     protected static final Logger LOGGER = LoggerFactory.getLogger(ApplicationModel.class);
     public static final String NAME = "ApplicationModel";
+    // 所有ModuleModel实例对象集合moduleModels
     private final List<ModuleModel> moduleModels = new CopyOnWriteArrayList<>();
+    // 发布的ModuleModel实例对象集合pubModuleModels
     private final List<ModuleModel> pubModuleModels = new CopyOnWriteArrayList<>();
+    // 环境信息Environment实例对象environment
     private Environment environment;
+    //配置管理ConfigManager实例对象configManager
     private ConfigManager configManager;
+    // 服务存储库ServiceRepository实例对象serviceRepository
     private ServiceRepository serviceRepository;
+    // 应用程序部署器ApplicationDeployer实例对象deployer
     private ApplicationDeployer deployer;
 
+    // 所属框架FrameworkModel实例对象frameworkModel
     private final FrameworkModel frameworkModel;
 
+    // 内部的模块模型ModuleModel实例对象internalModule
     private ModuleModel internalModule;
 
+    // 默认的模块模型ModuleModel实例对象defaultModule
     private volatile ModuleModel defaultModule;
 
     // internal module index is 0, default module index is 1
@@ -89,6 +102,7 @@ public class ApplicationModel extends ScopeModel {
      */
     public static ApplicationModel defaultModel() {
         // should get from default FrameworkModel, avoid out of sync
+        // 必须通过上层领域模型获取 applicationModel 对象
         return FrameworkModel.defaultModel().defaultApplication();
     }
 
@@ -195,13 +209,19 @@ public class ApplicationModel extends ScopeModel {
     }
 
     public ApplicationModel(FrameworkModel frameworkModel, boolean isInternal) {
+        //调用父类型ScopeModel传递参数,这个构造器的传递与前面看到的FrameworkModel构造器的中的调用参数有些不同
+        // 第一个参数我们为frameworkModel代表父域模型,
+        // 第二个参数标记域为应用程序级别APPLICATION,
+        // 第三个参数我们传递的为true代表为内部域
         super(frameworkModel, ExtensionScope.APPLICATION, isInternal);
         Assert.notNull(frameworkModel, "FrameworkModel can not be null");
+        // 应用程序域成员变量记录frameworkModel对象
         this.frameworkModel = frameworkModel;
         frameworkModel.addApplication(this);
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(getDesc() + " is created");
         }
+        // 初始化应用程序
         initialize();
         Assert.notNull(getApplicationServiceRepository(), "ApplicationServiceRepository can not be null");
         Assert.notNull(getApplicationConfigManager(), "ApplicationConfigManager can not be null");
@@ -211,25 +231,34 @@ public class ApplicationModel extends ScopeModel {
     @Override
     protected void initialize() {
         super.initialize();
+        // 创建一个内部的模型对象
         internalModule = new ModuleModel(this, true);
+        // 创建一个独立服务存储对象
         this.serviceRepository = new ServiceRepository(this);
 
+        // 获取应用程序初始化监听器ApplicationInitListener扩展
         ExtensionLoader<ApplicationInitListener> extensionLoader = this.getExtensionLoader(ApplicationInitListener.class);
+        // 如果存在应用程序初始化监听器扩展则执行这个初始化方法,在当前的版本还未看到有具体的扩展实现类型
         Set<String> listenerNames = extensionLoader.getSupportedExtensions();
         for (String listenerName : listenerNames) {
             extensionLoader.getExtension(listenerName).init();
         }
 
+        // 初始化扩展(这个是应用程序生命周期的方法调用,这里调用初始化方法）
         initApplicationExts();
 
+        // 获取域模型初始化器扩展对象列表,然后执行初始化方法
         ExtensionLoader<ScopeModelInitializer> initializerExtensionLoader = this.getExtensionLoader(ScopeModelInitializer.class);
+        // 获取ScopeModelInitializer类型的支持的扩展集合,这里当前版本存在8个扩展类型实现
         Set<ScopeModelInitializer> initializers = initializerExtensionLoader.getSupportedExtensionInstances();
+        // 遍历这些扩展实现调用他们的initializeApplicationModel方法来传递FrameworkModel类型对象
         for (ScopeModelInitializer initializer : initializers) {
             initializer.initializeApplicationModel(this);
         }
     }
 
     private void initApplicationExts() {
+        // 这个扩展实现一共有两个可以看下面那个图扩展类型为ConfigManager和Environment
         Set<ApplicationExt> exts = this.getExtensionLoader(ApplicationExt.class).getSupportedExtensionInstances();
         for (ApplicationExt ext : exts) {
             ext.initialize();

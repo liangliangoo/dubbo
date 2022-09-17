@@ -82,6 +82,7 @@ public class CodecSupport {
     }
 
     public static Serialization getSerialization(URL url) {
+        // dubbo SPI 机制 获取序列化方式，如果URL中没有配置序列化方式，那么将会采用hessian2的序列化方式
         return url.getOrDefaultFrameworkModel().getExtensionLoader(Serialization.class).getExtension(
                 url.getParameter(Constants.SERIALIZATION_KEY, Constants.DEFAULT_REMOTING_SERIALIZATION));
     }

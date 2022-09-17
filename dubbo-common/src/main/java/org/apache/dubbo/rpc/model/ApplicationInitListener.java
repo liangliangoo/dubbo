@@ -19,6 +19,9 @@ package org.apache.dubbo.rpc.model;
 import org.apache.dubbo.common.extension.ExtensionScope;
 import org.apache.dubbo.common.extension.SPI;
 
+/**
+ * 这个接口，在dubbo 3.0还没有具体实现
+ */
 @SPI(scope = ExtensionScope.APPLICATION)
 public interface ApplicationInitListener {
     /**

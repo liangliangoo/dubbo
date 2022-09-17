@@ -34,6 +34,7 @@ public class Application {
     public static void main(String[] args) throws Exception {
         System.setProperty("dubbo.application.logger", "log4j");
         System.setProperty("native", "true");
+        // 通过开关控制 dubbo 服务的两种启动方式
         if (isClassic(args)) {
             startWithExport();
         } else {
@@ -74,6 +75,7 @@ public class Application {
         service.setRef(new DemoServiceImpl());
 
         ApplicationConfig applicationConfig = new ApplicationConfig("dubbo-demo-api-provider");
+        // QoS的英文全称为"Quality of Service",中文名为"服务质量"。QoS是网络的一种安全机制, 是用来解决网络延迟和阻塞等问题的一种技术。
         applicationConfig.setQosEnable(false);
         applicationConfig.setCompiler("jdk");
 
