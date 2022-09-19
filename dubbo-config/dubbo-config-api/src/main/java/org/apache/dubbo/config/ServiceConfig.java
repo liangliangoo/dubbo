@@ -94,6 +94,14 @@ import static org.apache.dubbo.rpc.Constants.TOKEN_KEY;
 import static org.apache.dubbo.rpc.cluster.Constants.EXPORT_KEY;
 import static org.apache.dubbo.rpc.support.ProtocolUtils.isGeneric;
 
+/**
+ * 服务配置实现类
+ * 这个类型是我们出现的第一个服务配置实现类型,
+ * 服务配置实现类已经从父类型中继承了这么多的属性,这里主要为实现服务提供了一些配置如服务的协议配置,
+ * 服务的代理工厂JavassistProxyFactory是将生成导出服务代理的ProxyFactory实现，
+ * 是其默认实现,服务提供者模型,是否导出服务,导出的服务列表,服务监听器等等.
+ * @param <T>
+ */
 public class ServiceConfig<T> extends ServiceConfigBase<T> {
 
     private static final long serialVersionUID = 7868244018230856253L;
@@ -149,10 +157,18 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         super(moduleModel, service);
     }
 
+    /**
+     * 在ScopeModel 变动话 将会被调用
+     * 这个方法的作用，主要是因为领域模型发生了变更，会涉及到子类的相关成员变量信息
+     * @param oldScopeModel
+     * @param newScopeModel
+     */
     @Override
     protected void postProcessAfterScopeModelChanged(ScopeModel oldScopeModel, ScopeModel newScopeModel) {
         super.postProcessAfterScopeModelChanged(oldScopeModel, newScopeModel);
+        // 更新当前协议对象 通过Dubbo SPI 机制
         protocolSPI = this.getExtensionLoader(Protocol.class).getAdaptiveExtension();
+        // 获取当前代理工厂对象
         proxyFactory = this.getExtensionLoader(ProxyFactory.class).getAdaptiveExtension();
     }
 
