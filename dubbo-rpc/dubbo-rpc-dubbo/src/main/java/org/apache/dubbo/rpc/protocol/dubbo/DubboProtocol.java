@@ -324,6 +324,7 @@ public class DubboProtocol extends AbstractProtocol {
 
         // 服务暴露的核心代码
         openServer(url);
+        // 序列化相关代码
         optimizeSerialization(url);
 
         return exporter;

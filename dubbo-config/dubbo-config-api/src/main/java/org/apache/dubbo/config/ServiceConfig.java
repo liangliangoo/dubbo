@@ -402,6 +402,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
         providerModel.setDestroyCaller(getDestroyRunner());
         repository.registerProvider(providerModel);
 
+        // 获取所有组册中心的地址
         List<URL> registryURLs = ConfigValidationUtils.loadRegistries(this, true);
 
         for (ProtocolConfig protocolConfig : protocols) {
@@ -413,6 +414,7 @@ public class ServiceConfig<T> extends ServiceConfigBase<T> {
                 // In case user specified path, register service one more time to map it to path.
                 repository.registerService(pathKey, interfaceClass);
             }
+            // 把应用内的所有协议 注册的注册中心中
             doExportUrlsFor1Protocol(protocolConfig, registryURLs);
         }
 
