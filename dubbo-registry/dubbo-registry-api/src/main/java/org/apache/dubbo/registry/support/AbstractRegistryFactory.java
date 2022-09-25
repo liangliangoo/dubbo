@@ -85,6 +85,7 @@ public abstract class AbstractRegistryFactory implements RegistryFactory, ScopeM
             if (registry != null) {
                 return registry;
             }
+            // cache中获取不到 需要创建
             //create registry by spi/ioc
             registry = createRegistry(url);
             if (check && registry == null) {

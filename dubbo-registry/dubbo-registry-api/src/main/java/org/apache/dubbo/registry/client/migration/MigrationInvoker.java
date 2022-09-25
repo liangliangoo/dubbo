@@ -433,6 +433,7 @@ public class MigrationInvoker<T> implements MigrationClusterInvoker<T> {
             if (serviceDiscoveryInvoker != null) {
                 serviceDiscoveryInvoker.destroy();
             }
+            // registryProtocol类型为：InterfaceCompatibleRegistryProtocol
             serviceDiscoveryInvoker = registryProtocol.getServiceDiscoveryInvoker(cluster, registry, type, url);
         }
         setListener(serviceDiscoveryInvoker, () -> {

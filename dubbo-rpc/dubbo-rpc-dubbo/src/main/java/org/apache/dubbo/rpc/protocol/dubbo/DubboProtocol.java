@@ -322,6 +322,7 @@ public class DubboProtocol extends AbstractProtocol {
             }
         }
 
+        // 服务暴露的核心代码
         openServer(url);
         optimizeSerialization(url);
 
@@ -330,7 +331,7 @@ public class DubboProtocol extends AbstractProtocol {
 
     private void openServer(URL url) {
         checkDestroyed();
-        // find server.
+        // find server. 一个应用中会提供多个接口，但是他们会共用一个NettyServer
         String key = url.getAddress();
         // client can export a service which only for server to invoke
         boolean isServer = url.getParameter(IS_SERVER_KEY, true);
@@ -357,6 +358,11 @@ public class DubboProtocol extends AbstractProtocol {
         }
     }
 
+    /**
+     * 创建NettyServer
+     * @param url
+     * @return
+     */
     private ProtocolServer createServer(URL url) {
         url = URLBuilder.from(url)
             // send readonly event when server closes, it's enabled by default

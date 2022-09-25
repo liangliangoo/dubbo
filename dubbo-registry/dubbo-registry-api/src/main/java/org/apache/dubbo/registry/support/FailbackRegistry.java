@@ -231,10 +231,12 @@ public abstract class FailbackRegistry extends AbstractRegistry {
             return;
         }
         super.register(url);
+        // 移除无用的 URL
         removeFailedRegistered(url);
         removeFailedUnregistered(url);
         try {
             // Sending a registration request to the server side
+            // 向组册中心注册
             doRegister(url);
         } catch (Exception e) {
             if (!(e instanceof SkipFailbackWrapperException)) {

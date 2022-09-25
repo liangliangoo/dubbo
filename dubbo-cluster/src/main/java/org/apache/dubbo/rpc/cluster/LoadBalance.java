@@ -31,6 +31,8 @@ import java.util.List;
  * <p>
  * <a href="http://en.wikipedia.org/wiki/Load_balancing_(computing)">Load-Balancing</a>
  *
+ * dubbo 负载均衡策略
+ *
  * @see org.apache.dubbo.rpc.cluster.Cluster#join(Directory)
  */
 @SPI(RandomLoadBalance.NAME)

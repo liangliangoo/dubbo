@@ -291,6 +291,7 @@ public class MetadataInfo implements Serializable {
         if (subscribedServiceURLs == null) {
             subscribedServiceURLs = new ConcurrentSkipListMap<>();
         }
+        // 下面将其url添加到subscribedServiceURLs成员变量里面就结束了
         addURL(subscribedServiceURLs, url);
     }
 

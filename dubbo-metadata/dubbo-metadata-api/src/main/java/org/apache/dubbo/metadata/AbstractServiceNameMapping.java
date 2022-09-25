@@ -131,6 +131,7 @@ public abstract class AbstractServiceNameMapping implements ServiceNameMapping, 
         if (CollectionUtils.isEmpty(mappingServices)) {
             try {
                 logger.info("Local cache mapping is empty");
+                // 重点看这个同步调用获取注册中心的路径信息 call方法在父类型AbstractServiceNameMapping中
                 mappingServices = (new AsyncMappingTask(listener, subscribedURL, false)).call();
             } catch (Exception e) {
                 // ignore
@@ -275,6 +276,7 @@ public abstract class AbstractServiceNameMapping implements ServiceNameMapping, 
             synchronized (mappingListeners) {
                 Set<String> mappedServices = emptySet();
                 try {
+                    //这个缓存的key与服务接口和分组有关这里我没配置分组那就只有接口了 key为 为外暴露的服务类路径
                     String mappingKey = ServiceNameMapping.buildMappingKey(subscribedURL);
                     if (listener != null) {
                         mappedServices = toTreeSet(getAndListen(subscribedURL, listener));

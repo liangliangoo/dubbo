@@ -191,6 +191,7 @@ public class DefaultApplicationDeployer extends AbstractDeployer<ApplicationMode
             // @since 2.7.8
             startMetadataCenter();
 
+            // 初始化标记
             initialized = true;
 
             if (logger.isInfoEnabled()) {

@@ -47,7 +47,7 @@ public class RegistryManager {
     /**
      * Registry Collection Map<RegistryAddress, Registry>
      */
-    private final Map<String, Registry> registries = new ConcurrentHashMap<>();
+    private final Map<String, Registry> /**/registries = new ConcurrentHashMap<>();
 
     /**
      * The lock for the acquisition process of the registry

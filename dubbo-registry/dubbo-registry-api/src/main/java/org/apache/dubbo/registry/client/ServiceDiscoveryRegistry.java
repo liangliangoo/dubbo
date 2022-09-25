@@ -151,6 +151,7 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
         if (!shouldRegister(url)) { // Should Not Register
             return;
         }
+        // 注册服务的核心逻辑
         doRegister(url);
     }
 
@@ -178,9 +179,11 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
 
     @Override
     public final void subscribe(URL url, NotifyListener listener) {
+        // 前面是否注册shouldRegister为false这里是是否订阅shouldSubscribe方法结果为true
         if (!shouldSubscribe(url)) { // Should Not Subscribe
             return;
         }
+        // 执行具体的订阅逻辑
         doSubscribe(url, listener);
     }
 
@@ -193,12 +196,14 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
         boolean check = url.getParameter(CHECK_KEY, false);
 
         String key = ServiceNameMapping.buildMappingKey(url);
+        // 应用级服务发现悲观锁先加上一把
         Lock mappingLock = serviceNameMapping.getMappingLock(key);
         try {
             mappingLock.lock();
             Set<String> subscribedServices = serviceNameMapping.getCachedMapping(url);
             try {
                 MappingListener mappingListener = new DefaultMappingListener(url, subscribedServices, listener);
+                //注意注意这行代码超级重要 当前是服务接口要找到服务的应用名字 将会查询映射信息对应节点：
                 subscribedServices = serviceNameMapping.getAndListen(this.getUrl(), url, mappingListener);
                 mappingListeners.put(url.getProtocolServiceKey(), mappingListener);
             } catch (Exception e) {
@@ -212,7 +217,7 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
 //                }
                 return;
             }
-
+            // 执行订阅URL逻辑
             subscribeURLs(url, listener, subscribedServices);
         } finally {
             mappingLock.unlock();
@@ -297,6 +302,7 @@ public class ServiceDiscoveryRegistry extends FailbackRegistry {
     }
 
     protected void subscribeURLs(URL url, NotifyListener listener, Set<String> serviceNames) {
+        // 这里使用了TreeMap数据结构  [1、二叉树 2、红黑树 3、实现了NavigableMap]
         serviceNames = toTreeSet(serviceNames);
         String serviceNamesKey = toStringKeys(serviceNames);
         String protocolServiceKey = url.getProtocolServiceKey();

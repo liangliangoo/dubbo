@@ -412,6 +412,7 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
      */
     private URL getUrlToRegistry(final URL providerUrl, final URL registryUrl) {
         //The address you see at the registry
+        // 为服务提供方注入通用参数
         if (!registryUrl.getParameter(SIMPLIFIED_KEY, false)) {
             return providerUrl.removeParameters(getFilteredKeys(providerUrl)).removeParameters(
                 MONITOR_KEY, BIND_IP_KEY, BIND_PORT_KEY, QOS_ENABLE, QOS_HOST, QOS_PORT, ACCEPT_FOREIGN_IP, VALIDATION_KEY,
@@ -564,9 +565,11 @@ public class RegistryProtocol implements Protocol, ScopeModelAware {
         urlToRegistry = urlToRegistry.setServiceModel(directory.getConsumerUrl().getServiceModel());
         if (directory.isShouldRegister()) {
             directory.setRegisteredConsumerUrl(urlToRegistry);
+            // 这一行逻辑会走到ServiceDiscoveryRegistry  不过应用级消费者是无需注册服务数据的
             registry.register(directory.getRegisteredConsumerUrl());
         }
         directory.buildRouterChain(urlToRegistry);
+        // 发起订阅 与服务提供则建立长链接
         directory.subscribe(toSubscribeUrl(urlToRegistry));
 
         return (ClusterInvoker<T>) cluster.join(directory, true);

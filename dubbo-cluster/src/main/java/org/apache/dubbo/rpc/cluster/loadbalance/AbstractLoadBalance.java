@@ -58,6 +58,7 @@ public abstract class AbstractLoadBalance implements LoadBalance {
         if (invokers.size() == 1) {
             return invokers.get(0);
         }
+        // 调用具体的负载均衡组件
         return doSelect(invokers, url, invocation);
     }
 
